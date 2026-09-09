@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Banner không bị cắt trên điện thoại</title>
+<title>Banner Google Sites - full ảnh trên mọi thiết bị</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -11,89 +11,84 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #e8efe6;
+    background: transparent;
   }
 
   .stage {
     position: relative;
     width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
   }
 
-  /* Lớp nền: chính ảnh đó, làm mờ để lấp hai bên - trông đỡ trống */
+  /* Nền mờ lấp phần trống, lấy từ chính ảnh chính (JS gán) */
   .bg {
     position: absolute;
-    inset: -6%;
-    width: 112%;
-    height: 112%;
-    object-fit: cover;
-    filter: blur(28px) saturate(1.1);
-    opacity: .75;
+    inset: -8%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(30px) saturate(1.1);
+    opacity: .7;
   }
 
-  /* Ảnh chính: LUÔN hiện trọn vẹn, không bao giờ bị cắt */
+  /* Ảnh chính: luôn hiện TRỌN VẸN ở mọi kích thước màn hình */
   .main {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;      /* <- điểm mấu chốt: contain, không phải cover */
-    object-position: center;
+    position: relative;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
     cursor: zoom-in;
   }
 
-  .fs-btn {
+  .err {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 7px 12px;
-    font: 500 13px/1 system-ui, "Segoe UI", Arial, sans-serif;
-    color: #fff;
-    background: rgba(0, 0, 0, .45);
-    border: 1px solid rgba(255, 255, 255, .5);
-    border-radius: 6px;
-    cursor: pointer;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    font: 500 15px/1.6 system-ui, "Segoe UI", Arial, sans-serif;
+    color: #b3261e;
+    background: #fff4f4;
   }
-  .fs-btn:hover { background: rgba(0, 0, 0, .7); }
-
-  /* Màn hình hẹp (điện thoại): ẩn nút cho gọn */
-  @media (max-width: 600px) {
-    .fs-btn { display: none; }
-  }
-
-  :fullscreen .stage { background: #000; }
 </style>
 </head>
 <body>
   <div class="stage">
-    <!-- ↓↓↓ DÁN LINK ẢNH VÀO CẢ HAI CHỖ src BÊN DƯỚI ↓↓↓ -->
-    <img class="bg"   src="DAN_LINK_ANH_VAO_DAY" alt="" aria-hidden="true">
-    <img class="main" id="banner" src="DAN_LINK_ANH_VAO_DAY" alt="">
-    <!-- ↑↑↑ DÁN LINK ẢNH VÀO CẢ HAI CHỖ src BÊN TRÊN ↑↑↑ -->
+    <div class="bg" id="bg"></div>
 
-    <button id="fsBtn" class="fs-btn" type="button">⛶ Toàn màn hình</button>
+    <!-- ===== CHỈ THAY LINK ẢNH Ở ĐÚNG MỘT CHỖ NÀY ===== -->
+    <img class="main" id="banner" src="DAN_LINK_ANH_VAO_DAY" alt="">
+    <!-- ================================================= -->
+
+    <div class="err" id="err">
+      Không tải được ảnh.<br>
+      Hãy mở link ảnh trong một tab trình duyệt để kiểm tra trước khi dán vào src.
+    </div>
   </div>
 
   <script>
     var img = document.getElementById('banner');
-    var root = document.documentElement;
 
-    function goFullscreen() {
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
-        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-        return;
-      }
-      var req = root.requestFullscreen || root.webkitRequestFullscreen;
-      if (req) {
-        Promise.resolve(req.call(root)).catch(function () { window.open(img.src, '_blank'); });
-      } else {
-        window.open(img.src, '_blank');
-      }
-    }
+    // Lớp nền mờ dùng chung link với ảnh chính - không phải dán link hai lần
+    document.getElementById('bg').style.backgroundImage = 'url("' + img.src + '")';
 
-    document.getElementById('fsBtn').addEventListener('click', goFullscreen);
-    img.addEventListener('click', goFullscreen);
+    img.addEventListener('error', function () {
+      img.style.display = 'none';
+      document.getElementById('bg').style.display = 'none';
+      document.getElementById('err').style.display = 'flex';
+    });
+
+    // Bấm vào ảnh để mở ảnh gốc ở tab mới (xem full trên điện thoại)
+    img.addEventListener('click', function () {
+      window.open(img.src, '_blank');
+    });
   </script>
 </body>
 </html>
