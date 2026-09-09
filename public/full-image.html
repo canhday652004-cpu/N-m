@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ảnh full toàn trang</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* Ảnh phủ kín toàn bộ trang (cắt bớt phần thừa) */
+  .full-image {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;      /* đổi thành contain nếu muốn thấy trọn ảnh, không bị cắt */
+    object-position: center;
+    cursor: zoom-in;
+  }
+</style>
+</head>
+<body>
+  <img
+    id="banner"
+    class="full-image"
+    src="https://example.com/anh-cua-ban.jpg"
+    alt="Nấm an toàn - chất lượng cao">
+
+  <script>
+    // Bấm vào ảnh để xem toàn màn hình (fullscreen thật của trình duyệt)
+    var img = document.getElementById('banner');
+    img.addEventListener('click', function () {
+      if (!document.fullscreenElement) {
+        (document.documentElement.requestFullscreen ||
+         document.documentElement.webkitRequestFullscreen).call(document.documentElement);
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>
