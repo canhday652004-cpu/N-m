@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ảnh full toàn trang</title>
+<title>Ảnh full toàn màn hình</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -11,38 +11,77 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #000;
+    /* màu nền trùng với viền ảnh để không thấy vạch trắng */
+    background: #e8efe6;
   }
 
-  /* Ảnh phủ kín toàn bộ trang (cắt bớt phần thừa) */
+  .wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
   .full-image {
     display: block;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;      /* đổi thành contain nếu muốn thấy trọn ảnh, không bị cắt */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;        /* phủ kín khung, cắt bớt phần thừa */
     object-position: center;
-    cursor: zoom-in;
   }
+
+  .fs-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 8px 14px;
+    font: 500 14px/1 system-ui, "Segoe UI", Arial, sans-serif;
+    color: #fff;
+    background: rgba(0, 0, 0, .45);
+    border: 1px solid rgba(255, 255, 255, .5);
+    border-radius: 6px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background .2s;
+  }
+  .fs-btn:hover { background: rgba(0, 0, 0, .7); }
+
+  /* khi đang ở chế độ toàn màn hình thì ảnh hiện trọn vẹn, không bị cắt */
+  :fullscreen .full-image { object-fit: contain; }
+  :fullscreen body, :fullscreen .wrap { background: #000; }
 </style>
 </head>
 <body>
-  <img
-    id="banner"
-    class="full-image"
-    src="https://example.com/anh-cua-ban.jpg"
-    alt="Nấm an toàn - chất lượng cao">
+  <div class="wrap">
+    <img id="banner" class="full-image"
+         src="https://example.com/anh-cua-ban.jpg"
+         alt="Nấm an toàn - chất lượng cao">
+
+    <button id="fsBtn" class="fs-btn" type="button">⛶ Toàn màn hình</button>
+  </div>
 
   <script>
-    // Bấm vào ảnh để xem toàn màn hình (fullscreen thật của trình duyệt)
-    var img = document.getElementById('banner');
-    img.addEventListener('click', function () {
-      if (!document.fullscreenElement) {
-        (document.documentElement.requestFullscreen ||
-         document.documentElement.webkitRequestFullscreen).call(document.documentElement);
-      } else {
-        document.exitFullscreen();
+    var img   = document.getElementById('banner');
+    var btn   = document.getElementById('fsBtn');
+    var root  = document.documentElement;
+
+    function goFullscreen() {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        return;
       }
-    });
+      var req = root.requestFullscreen || root.webkitRequestFullscreen;
+      if (req) {
+        // nếu trình duyệt / iframe chặn fullscreen thì mở ảnh ở tab mới
+        Promise.resolve(req.call(root)).catch(function () {
+          window.open(img.src, '_blank');
+        });
+      } else {
+        window.open(img.src, '_blank');
+      }
+    }
+
+    btn.addEventListener('click', goFullscreen);
+    img.addEventListener('click', goFullscreen);
   </script>
 </body>
 </html>
