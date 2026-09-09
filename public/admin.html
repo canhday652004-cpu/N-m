@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trang quản trị — ShopVN</title>
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚙️</text></svg>">
+</head>
+<body>
+
+<!-- ---------- Màn hình đăng nhập ---------- -->
+<div id="login-view" class="login-wrap hidden">
+  <div class="panel login-card">
+    <h1>Đăng nhập quản trị</h1>
+    <p class="muted small">Tài khoản mặc định: <code>admin</code> / <code>admin123</code></p>
+    <form id="login-form">
+      <div class="field">
+        <label for="login-username">Tài khoản</label>
+        <input id="login-username" name="username" required autocomplete="username" autofocus>
+      </div>
+      <div class="field">
+        <label for="login-password">Mật khẩu</label>
+        <input id="login-password" name="password" type="password" required autocomplete="current-password">
+      </div>
+      <p id="login-error" class="small hidden" style="color: var(--danger)"></p>
+      <button class="btn btn-primary btn-block" type="submit">Đăng nhập</button>
+    </form>
+    <p class="small center" style="margin-bottom:0"><a href="/">← Về cửa hàng</a></p>
+  </div>
+</div>
+
+<!-- ---------- Khu vực quản trị ---------- -->
+<div id="admin-view" class="admin-layout hidden">
+  <aside class="sidebar">
+    <a class="logo" href="/"><span class="logo-mark">S</span> ShopVN</a>
+    <button class="tab-btn active" data-tab="dashboard" type="button">📊 Tổng quan</button>
+    <button class="tab-btn" data-tab="products" type="button">📦 Sản phẩm</button>
+    <button class="tab-btn" data-tab="categories" type="button">🏷️ Danh mục</button>
+    <button class="tab-btn" data-tab="orders" type="button">🧾 Đơn hàng</button>
+    <div class="sidebar-footer">
+      <div class="small muted">Xin chào, <strong id="current-user"></strong></div>
+      <button id="logout-btn" class="btn btn-sm btn-block" type="button" style="margin-top:.4rem">Đăng xuất</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <!-- Tổng quan -->
+    <section id="tab-dashboard" class="tab-panel">
+      <h1>Tổng quan</h1>
+      <div id="stat-grid" class="stat-grid"></div>
+      <div class="panel">
+        <h2>Hướng dẫn nhanh</h2>
+        <ul class="muted">
+          <li>Tab <strong>Sản phẩm</strong>: thêm, sửa, xoá sản phẩm và bật/tắt hiển thị ngoài cửa hàng.</li>
+          <li>Tab <strong>Danh mục</strong>: quản lý nhóm sản phẩm (không xoá được nếu còn sản phẩm bên trong).</li>
+          <li>Tab <strong>Đơn hàng</strong>: xem chi tiết, đổi trạng thái hoặc xoá đơn.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Sản phẩm -->
+    <section id="tab-products" class="tab-panel hidden">
+      <div class="row-between" style="margin-bottom:1rem">
+        <h1 style="margin:0">Sản phẩm</h1>
+        <div class="row">
+          <input id="product-search" type="search" placeholder="Tìm theo tên…" aria-label="Tìm sản phẩm">
+          <button id="add-product-btn" class="btn btn-primary" type="button">+ Thêm sản phẩm</button>
+        </div>
+      </div>
+      <div class="panel table-wrap">
+        <table>
+          <thead>
+            <tr><th>Sản phẩm</th><th>Danh mục</th><th>Giá</th><th>Tồn kho</th><th>Trạng thái</th><th></th></tr>
+          </thead>
+          <tbody id="product-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Danh mục -->
+    <section id="tab-categories" class="tab-panel hidden">
+      <div class="row-between" style="margin-bottom:1rem">
+        <h1 style="margin:0">Danh mục</h1>
+        <button id="add-category-btn" class="btn btn-primary" type="button">+ Thêm danh mục</button>
+      </div>
+      <div class="panel table-wrap">
+        <table>
+          <thead><tr><th>Tên</th><th>Slug</th><th>Số sản phẩm</th><th></th></tr></thead>
+          <tbody id="category-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Đơn hàng -->
+    <section id="tab-orders" class="tab-panel hidden">
+      <div class="row-between" style="margin-bottom:1rem">
+        <h1 style="margin:0">Đơn hàng</h1>
+        <select id="order-filter" aria-label="Lọc theo trạng thái">
+          <option value="">Tất cả trạng thái</option>
+        </select>
+      </div>
+      <div class="panel table-wrap">
+        <table>
+          <thead>
+            <tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày đặt</th><th></th></tr>
+          </thead>
+          <tbody id="order-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ---------- Modal: sản phẩm ---------- -->
+<div id="product-modal" class="modal hidden">
+  <div class="modal-card wide">
+    <button class="modal-close" type="button" data-close-modal="product-modal" aria-label="Đóng">&times;</button>
+    <h2 id="product-modal-title">Thêm sản phẩm</h2>
+    <form id="product-form">
+      <div class="field">
+        <label for="pf-name">Tên sản phẩm *</label>
+        <input id="pf-name" name="name" required maxlength="200">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="pf-price">Giá (VNĐ) *</label>
+          <input id="pf-price" name="price" type="number" min="0" step="1000" required>
+        </div>
+        <div class="field">
+          <label for="pf-stock">Tồn kho</label>
+          <input id="pf-stock" name="stock" type="number" min="0" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label for="pf-category">Danh mục</label>
+        <select id="pf-category" name="category_id"></select>
+      </div>
+      <div class="field">
+        <label for="pf-image">Ảnh (URL)</label>
+        <input id="pf-image" name="image_url" maxlength="1000" placeholder="https://…">
+      </div>
+      <div class="field">
+        <label for="pf-description">Mô tả</label>
+        <textarea id="pf-description" name="description" maxlength="5000"></textarea>
+      </div>
+      <div class="field checkbox">
+        <input id="pf-active" name="active" type="checkbox" checked>
+        <label for="pf-active">Hiển thị ngoài cửa hàng</label>
+      </div>
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Lưu</button>
+        <button class="btn" type="button" data-close-modal="product-modal">Huỷ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ---------- Modal: danh mục ---------- -->
+<div id="category-modal" class="modal hidden">
+  <div class="modal-card">
+    <button class="modal-close" type="button" data-close-modal="category-modal" aria-label="Đóng">&times;</button>
+    <h2 id="category-modal-title">Thêm danh mục</h2>
+    <form id="category-form">
+      <div class="field">
+        <label for="cf-name">Tên danh mục *</label>
+        <input id="cf-name" name="name" required maxlength="120">
+      </div>
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Lưu</button>
+        <button class="btn" type="button" data-close-modal="category-modal">Huỷ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ---------- Modal: chi tiết đơn hàng ---------- -->
+<div id="order-modal" class="modal hidden">
+  <div class="modal-card wide">
+    <button class="modal-close" type="button" data-close-modal="order-modal" aria-label="Đóng">&times;</button>
+    <h2 id="order-detail-title">Chi tiết đơn hàng</h2>
+    <div id="order-detail-body"></div>
+  </div>
+</div>
+
+<script type="module" src="/js/admin.js"></script>
+</body>
+</html>

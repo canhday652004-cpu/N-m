@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShopVN — Cửa hàng công nghệ</title>
+  <meta name="description" content="Cửa hàng trực tuyến: điện thoại, laptop, phụ kiện và đồng hồ thông minh.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🛍️</text></svg>">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="/"><span class="logo-mark">S</span> ShopVN</a>
+      <nav class="nav-links">
+        <a href="/admin">Quản trị</a>
+        <button id="cart-toggle" class="btn cart-button" type="button">
+          Giỏ hàng
+          <span id="cart-count" class="cart-count hidden">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Công nghệ chính hãng, giá tốt mỗi ngày</h1>
+      <p>Điện thoại, laptop, phụ kiện và đồng hồ thông minh — giao hàng toàn quốc, thanh toán khi nhận hàng.</p>
+    </section>
+
+    <div class="toolbar">
+      <input id="filter-search" type="search" placeholder="Tìm sản phẩm…" aria-label="Tìm sản phẩm">
+      <select id="filter-category" aria-label="Lọc theo danh mục">
+        <option value="">Tất cả danh mục</option>
+      </select>
+    </div>
+
+    <section id="product-grid" class="product-grid" aria-live="polite">
+      <div class="empty">Đang tải sản phẩm…</div>
+    </section>
+  </main>
+
+  <!-- Giỏ hàng -->
+  <div id="cart-overlay" class="overlay hidden"></div>
+  <aside id="cart-drawer" class="drawer hidden" aria-label="Giỏ hàng">
+    <div class="drawer-header">
+      <h2>Giỏ hàng</h2>
+      <button id="cart-close" class="modal-close" type="button" aria-label="Đóng">&times;</button>
+    </div>
+    <div id="cart-body" class="drawer-body"></div>
+    <div class="drawer-footer">
+      <div class="total-row"><span>Tổng cộng</span><span id="cart-total">0 ₫</span></div>
+      <button id="checkout-btn" class="btn btn-primary btn-block" type="button" disabled>Đặt hàng</button>
+    </div>
+  </aside>
+
+  <!-- Thông tin đặt hàng -->
+  <div id="checkout-modal" class="modal hidden">
+    <div class="modal-card">
+      <button id="checkout-close" class="modal-close" type="button" aria-label="Đóng">&times;</button>
+      <h2>Thông tin giao hàng</h2>
+      <p class="muted small">Chúng tôi sẽ gọi xác nhận trước khi giao. Thanh toán khi nhận hàng (COD).</p>
+      <form id="checkout-form">
+        <div class="field-row">
+          <div class="field">
+            <label for="co-name">Họ và tên *</label>
+            <input id="co-name" name="customer_name" required maxlength="120" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="co-phone">Số điện thoại *</label>
+            <input id="co-phone" name="phone" required maxlength="30" inputmode="tel" autocomplete="tel">
+          </div>
+        </div>
+        <div class="field">
+          <label for="co-email">Email</label>
+          <input id="co-email" name="email" type="email" maxlength="160" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="co-address">Địa chỉ nhận hàng *</label>
+          <input id="co-address" name="address" required maxlength="400" autocomplete="street-address">
+        </div>
+        <div class="field">
+          <label for="co-note">Ghi chú</label>
+          <textarea id="co-note" name="note" maxlength="1000" placeholder="Ví dụ: giao giờ hành chính"></textarea>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Xác nhận đặt hàng</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Đặt hàng thành công -->
+  <div id="success-modal" class="modal hidden">
+    <div class="modal-card center">
+      <h2>Đặt hàng thành công 🎉</h2>
+      <p>Mã đơn hàng của bạn là <strong id="success-code"></strong>.</p>
+      <p>Tổng thanh toán: <strong id="success-total"></strong></p>
+      <button id="success-close" class="btn btn-primary" type="button">Tiếp tục mua sắm</button>
+    </div>
+  </div>
+
+  <script type="module" src="/js/store.js"></script>
+</body>
+</html>
